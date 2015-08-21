@@ -1,0 +1,28 @@
+#!/bin/bash
+
+underline() {
+  perl -e 'print "$ARGV[0]\n"; print "=" x length($ARGV[0]); print "\n";' "$1"
+}
+
+if [ "$1" ]; then
+
+  TAGNAME="$1"
+  
+else
+
+  echo "..."
+  git tag -n1 | sort -V | tail -20
+
+  MOST_RECENT_TAG=$(git tag | sort -V | tail -1)
+
+  read -p "Enter a tag [$MOST_RECENT_TAG] " TAGNAME
+
+  TAGNAME="${TAGNAME:-$MOST_RECENT_TAG}"
+
+fi
+
+echo
+underline "Commits since $TAGNAME"
+echo
+git log "$TAGNAME".. --no-merges --pretty=format:"%h [%ad] [%cn] %s" --graph --date=short
+echo
